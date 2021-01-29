@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
 using Items;
 using UnityEngine;
 using Mirror;
-using Objects.Disposals;
 
 /// <summary>
 /// Allows a storage object to be interacted with, to open/close it and drag things. Works for
@@ -57,9 +55,6 @@ public class InteractableStorage : MonoBehaviour, IClientInteractable<HandActiva
 	/// </summary>
 	[SerializeField] [Tooltip("Can you empty out all items by activating this item?")]
 	private bool canQuickEmpty = false;
-
-	[SerializeField] [Tooltip("Can you empty out all items by activating this item?")]
-	private bool canDumpInDisposal = false;
 
 	/// <summary>
 	/// The current pickup mode used when clicking
@@ -219,15 +214,7 @@ public class InteractableStorage : MonoBehaviour, IClientInteractable<HandActiva
 
 			return true;
 		}
-		if (canDumpInDisposal)
-		{
-			if (interaction.TargetObject.TryGetComponent<DisposalBin>(out var blank) == true)
-			{
-				//Chat.AddLocalMsgToChat("We passed the client side check", gameObject);
-				return true;
-			}
-		}
-		if (canClickPickup)
+		else if (canClickPickup)
 		{
 			// If we can click pickup then try to store the target object
 			switch (pickupMode)
@@ -266,9 +253,11 @@ public class InteractableStorage : MonoBehaviour, IClientInteractable<HandActiva
 			// tile could still be picked up, so we interact
 			return true;
 		}
-
-
-		return false;
+		else
+		{
+			// We're not the target and we can't click pickup so don't do anything
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -285,21 +274,9 @@ public class InteractableStorage : MonoBehaviour, IClientInteractable<HandActiva
 		{
 			// Add hand item to this storage
 			Inventory.ServerTransfer(interaction.HandSlot, itemStorage.GetBestSlotFor(interaction.HandObject));
-			return;
-		}
-		if (canDumpInDisposal)
-		{
-			if (interaction.TargetObject.TryGetComponent<DisposalBin>(out var disposalBin) == true)
-			{
-				//Chat.AddLocalMsgToChat("We passed the server side check, the bag has this many slots: " + itemStorage.ItemStorageCapacity, gameObject);
-				disposalBin.BagDump(ItemStorage);
-				var storage = interaction.HandObject.GetComponent<InteractableStorage>();
-				storage.ItemStorage.ServerClear();
-				return;
-			}
 		}
 		// See if this item can click pickup
-		if (canClickPickup)
+		else if (canClickPickup)
 		{
 			bool pickedUpSomething = false;
 			Pickupable pickup;
