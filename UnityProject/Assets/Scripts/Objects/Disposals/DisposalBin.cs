@@ -300,6 +300,27 @@ namespace Objects.Disposals
 			StoreItem(obj);
 		}
 
+		/// <summary>
+		/// Pass in a bag with an inverntory and it will dump its contents into trash
+		/// </summary>
+		/// <param name="obj"> Bag </param>
+		/// <param name="itemStorage"> The itemStorage component of the Bag </param>
+		public void BagDump(ItemStorage itemStorage)
+		{
+			int i = 0;
+			foreach (var slot in itemStorage.GetItemSlots())
+			{
+				GameObject storedItem = slot.ItemObject;
+				// \/ this is causing it to not work
+				// If slot is empty don't store it
+				if (slot.IsOccupied != true) continue;
+				StoreItem(storedItem);
+				i++;
+				Chat.AddLocalMsgToChat("Stored: " + storedItem.ExpensiveName(), gameObject);
+			}
+			Chat.AddLocalMsgToChat("In total we stored: " + i + " items!", gameObject);
+		}
+
 		private void StoreItem(GameObject obj)
 		{
 			if (virtualContainer == null)
