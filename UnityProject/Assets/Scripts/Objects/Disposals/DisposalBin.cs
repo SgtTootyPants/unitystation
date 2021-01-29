@@ -302,12 +302,17 @@ namespace Objects.Disposals
 
 		public void BagDump(ItemStorage itemStorage)
 		{
+			int i = 0;
 			foreach (var slot in itemStorage.GetItemSlots())
 			{
+				GameObject storedItem = slot.ItemObject;
 				// If slot is empty don't store it
 				if (slot.IsOccupied == false) continue;
-				StoreItem(slot.ItemObject);
+				StoreItem(storedItem);
+				i++;
+				Chat.AddLocalMsgToChat("Stored: " + storedItem.ExpensiveName(), gameObject);
 			}
+			Chat.AddLocalMsgToChat("In total we stored: " + i + " items!", gameObject);
 		}
 
 
