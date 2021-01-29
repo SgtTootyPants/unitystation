@@ -300,6 +300,22 @@ namespace Objects.Disposals
 			StoreItem(obj);
 		}
 
+		public void BagDump(ItemStorage itemStorage)
+		{
+			int i = 0;
+			foreach (var slot in itemStorage.GetItemSlots())
+			{
+				GameObject storedItem = slot.ItemObject;
+				// If slot is empty don't store it
+				if (slot.IsOccupied == false) continue;
+				StoreItem(storedItem);
+				i++;
+				Chat.AddLocalMsgToChat("Stored: " + storedItem.ExpensiveName(), gameObject);
+			}
+			Chat.AddLocalMsgToChat("In total we stored: " + i + " items!", gameObject);
+		}
+
+
 		private void StoreItem(GameObject obj)
 		{
 			if (virtualContainer == null)
